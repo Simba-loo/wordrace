@@ -10,7 +10,17 @@ from sklearn.neighbors import NearestNeighbors
 
 n_neighbors = 10
 
-def parse_data(path,d):
+def parse_vocab(path):
+  fp = open(path,'r')
+  vocab = []
+  line = 'a'
+  while line:
+    line = fp.readline()
+    vocab.append(line[0:-1])
+  return(vocab)
+
+
+def parse_data(path,d, vocab):
     fp = open(path, 'r')
     vectors = []
     words = []
@@ -36,21 +46,26 @@ def parse_data(path,d):
         continue
 
        vector = [float(e) for e in vector_str]
-       words.append(word)
-       vectors.append(vector)
-       vec_dict[sum(vector)] = word
-       word_dict[word] = vector
-       count+=1
+       if word in vocab:
+        words.append(word)
+        vectors.append(vector)
+        vec_dict[sum(vector)] = word
+        word_dict[word] = vector
+        count+=1
     print(count)
     fp.close()
     return(words,vectors,vec_dict,word_dict)
 
+vocab_path = 'nouns.txt'
 path = '20k50d.csv'
 d = 50
 
-words,vectors,vec_dict,word_dict = parse_data(path,d)
+vocab = parse_vocab(vocab_path)
+
+words,vectors,vec_dict,word_dict = parse_data(path,d,vocab)
 neigh = NearestNeighbors(5, 1.0)
 neigh.fit(vectors)
+print(vocab)
 while True:
     word = input("Pick a word:")
     #word = 'car'
